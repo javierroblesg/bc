@@ -1,0 +1,76 @@
+a:hover {
+  color: #007bff !important;
+  text-decoration: none !important;
+}
+
+.btn.btn-success:hover {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+.btn.btn-info:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.tb.btn {
+  margin-right: 5px;
+}
+
+.card {
+  border: 0px !important;
+}
+.card-header {
+  padding-bottom: 0px !important;
+}
+.card-body {
+  padding-top: 0px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  padding-bottom: 0px !important;
+}
+
+.active.page-item a{
+  background-color: #5e72e4 !important;
+  border-color: #5e72e4 !important;
+  color: white;
+}
+.active.page-item a:hover{
+  color: white !important;
+}
+.page-item a{
+  color: black;
+}
+.page-item a:hover{
+  color: gray !important;
+}
+
+.py-4.table-responsive{
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+thead {
+  color: #525f7f;
+  background-color: #f6f9fc;
+  font-size: 13px !important;
+  text-transform: uppercase;
+}
+th {
+  vertical-align: middle !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+th:focus {
+  outline: none;
+}
+td {
+  font-size: 14px !important;
+}
+span {
+  font-size: 14px;
+}
+.filter.text-filter.form-control {
+  font-size: 12px !important;
+}
+label.filter-label {
+  display: block !important;
+}

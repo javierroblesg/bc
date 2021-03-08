@@ -1,0 +1,46 @@
+.admin-navbar {
+  position: relative;
+  overflow: hidden;
+  padding: 0 0px;
+  width: 100vw;
+}
+
+ul.navbar-lu {
+  list-style-type: none;
+  margin-bottom: 16px;
+  padding: 0;
+  overflow: hidden;
+  background-color: #484644;
+}
+
+li.navbar-li {
+  float: left;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li.right {float: right; padding-right: 20px; cursor: pointer; font-size: 15px;}
+li.right a:hover:not(.active) {color: white; text-decoration: none;}
+
+/* BrandName in navbar */
+li.navbar-li  a {
+  color: white;
+  font-weight: 600;
+}
+li.brand:hover:not(.active) {background-color: #605e5c;}
+li.brand a:hover:not(.active) {background-color: #605e5c; color: white !important; text-decoration: none;}
+li.brand {margin-left: 60px !important;}
+
+li.navbar-li i {
+  font-size: 20px !important;
+  padding-right: 15px !important;
+}
+
+@media screen and (max-width: 600px) {
+  li.navbar-li {float: none; padding: 14px 16px;}
+  li.navbar-li {margin-left: 0px !important;}
+  li {float: none;}
+}
