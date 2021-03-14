@@ -1,6 +1,7 @@
 import Home from './components/Home/Home';
 import Users from './components/Users/UsersRouter';
 import Agenda from './components/Agenda/Agenda';
+import UserTypes from './components/UserTypes/UserTypesRouter';
 
 const routes = [
   {
@@ -15,11 +16,20 @@ const routes = [
   {
     path: "/users",
     name: "Usuarios",
-    icon: "fa fa-fw fa-users",
+    icon: "fa fa-fw fa-user",
     color: "#4f9e1b",
     component: Users,
     layout: "/admin",
     module: 1
+  },
+  {
+    path: "/user_types",
+    name: "Tipos de usuarios",
+    icon: "fa fa-fw fa-users",
+    color: "#4f9e1b",
+    component: UserTypes,
+    layout: "/noAdmin",
+    module: 2
   },
   {
     path: "/agenda",

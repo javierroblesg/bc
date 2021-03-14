@@ -3,7 +3,8 @@ import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 
 import { auth } from './auth';
-import { users, singleUser } from './users';
+import { users, singleUser, userTypes } from './users';
+import { servicesCategories } from './services';
 import { flashMessage } from './flashMessage'
 
 export const ConfigureStore = () => {
@@ -11,8 +12,10 @@ export const ConfigureStore = () => {
     combineReducers({
       auth,
       users,
+      userTypes,
       singleUser,
-      flashMessage
+      flashMessage,
+      servicesCategories
     }),
     applyMiddleware(thunk, logger)
   );

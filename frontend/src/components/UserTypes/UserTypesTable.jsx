@@ -2,29 +2,24 @@ import React, { useState, useEffect } from 'react';
 import ReactBSAlert from "react-bootstrap-sweetalert";
 import { Link } from 'react-router-dom';
 import {Card, Row, Col, CardHeader, CardTitle, CardBody, Button, Tooltip } from "reactstrap";
-import AddUser from './AddUser';
+import AddUserType from './AddUserType';
 
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 import filterFactory, { textFilter, selectFilter } from 'react-bootstrap-table2-filter';
 
-import './UsersTable.css';
-
 import { connect } from 'react-redux';
-import { fetchUsers, fetchDeleteUser } from './UsersFunctions.js';
-import { fetchUserTypes } from '../UserTypes/UserTypeFunctions';
+import { fetchUserTypes, fetchDeleteUserType } from './UserTypeFunctions.js';
 const mapStateToProps = state => {
   return {
     auth: state.auth,
-    users: state.users,
     userTypes: state.userTypes
   }
 }
 const mapDispatchToProps = (dispatch) => ({
-  fetchUsers: () => dispatch(fetchUsers()),
-  fetchDeleteUser: (userId) => dispatch(fetchDeleteUser(userId)),
-  fetchUserTypes: () => dispatch(fetchUserTypes())
+  fetchUserTypes: () => dispatch(fetchUserTypes()),
+  fetchDeleteUserType: (userTypeId)  => dispatch(fetchDeleteUserType(userTypeId))
 })
 
 const pagination = paginationFactory({
@@ -61,17 +56,17 @@ const NoDataIndication = () => (
   </div>
 );
 
-const UsersTable = props => {
+const UserTypesTable = props => {
   const [alert, setAlert] = useState(null);
-  const handleDelete = (userId) => {
+  const handleDelete = (userTypeId) => {
     setAlert(
       <ReactBSAlert
         custom
-        title="Borrar usuario?"
+        title="Borrar tipo de usuario?"
         customIcon={
             <i style={{fontSize: 50, color: '#17a2b8', paddingBottom: 15}} className="fa fa-question-circle"></i>
         }
-        onConfirm={() => {setAlert(null); props.fetchDeleteUser(userId)}}
+        onConfirm={() => {setAlert(null); props.fetchDeleteUserType(userTypeId)}}
         onCancel={() => setAlert(null)}
         showCancel
         confirmBtnBsStyle="btn btn-success white"
@@ -83,42 +78,32 @@ const UsersTable = props => {
     )
   }
 
-  const [isAddUser, setIsAddUser] = useState(false);
-  const toggleIsAddUser = () => {
-    setIsAddUser((prev => !prev));
+  const [isAddUserType, setIsAddUserType] = useState(false);
+  const toggleIsAddUserType = () => {
+    setIsAddUserType((prev => !prev));
   }
 
-  const refreshUsers = () => {
-    props.fetchUsers();
+  const refreshUserTypes = () => {
     props.fetchUserTypes();
   }
 
   useEffect(() => {
-    if (!props.users.loaded && !props.users.isLoading) {
-      props.fetchUsers();
-    }
     if (!props.userTypes.loaded && !props.userTypes.isLoading) {
       props.fetchUserTypes();
     }
-    if (props.users.errorMessage || props.userTypes.errorMessage) {
+    if (props.userTypes.errorMessage) {
       setAlert(
         <ReactBSAlert danger
-          title="Error cargando usuarios"
+          title="Error cargando tipos de usuario"
           confirmBtnText="Entendido"
           onConfirm={() => setAlert(null)}
           confirmBtnBsStyle="default"
         >
-          {props.users.errorMessage}
+          {props.userTypes.errorMessage}
         </ReactBSAlert>
       );
     }
   }, [props])
-  const selectOptions = {
-    1: 'Admin',
-    2: 'Estilista',
-    3: 'Gerente',
-    4: 'Masajista'
-  };
 
   const [tooltipOpen1, setTooltipOpen1] = useState(false);
   const toggle1 = () => setTooltipOpen1(!tooltipOpen1);
@@ -129,13 +114,15 @@ const UsersTable = props => {
   return (
     <>
       {alert}
-      <AddUser isAddUser={isAddUser} toggleIsAddUser={toggleIsAddUser} />
+      <AddUserType isAddUserType={isAddUserType} toggleIsAddUserType={toggleIsAddUserType} />
       <Row>
         <Col md="12">
           <p>
             <Link to="/home"><span className="text-muted">Inicio</span></Link>
             <span className="text-muted"> &gt;</span>{" "}
-            <Link to="/users" style={{fontSize: 14}}>Usuarios</Link>
+            <Link to="/users" style={{fontSize: 14}}><span className="text-muted">Usuarios</span></Link>
+            <span className="text-muted"> &gt;</span>{" "}
+            <Link to="/users" style={{fontSize: 14}}>Tipos de Usuarios</Link>
           </p>
         </Col>
       </Row>
@@ -143,8 +130,8 @@ const UsersTable = props => {
         <Col md="12">
           <Card>
             <CardHeader>
-              <CardTitle style={{float: 'left'}} tag="h3">Usuarios</CardTitle>
-              <Button style={{float: 'right'}} size="sm" className="btn btn-info" onClick={() => refreshUsers()} id ="refreshUsers">
+              <CardTitle style={{float: 'left'}} tag="h3">Tipos de Usuarios</CardTitle>
+              <Button style={{float: 'right'}} size="sm" className="btn btn-info" onClick={() => refreshUserTypes()} id ="refreshUsers">
                 <i className="fa fa-refresh"></i>
               </Button>
               <Tooltip placement="bottom" isOpen={tooltipOpen1} target="refreshUsers" toggle={toggle1}>
@@ -152,7 +139,7 @@ const UsersTable = props => {
               </Tooltip>
               {props.auth.modules[1] === 2 ?
                 <>
-                  <Button style={{float: 'right'}} size="sm" className="tb btn btn-success" onClick={() => toggleIsAddUser()} id="addUser">
+                  <Button style={{float: 'right'}} size="sm" className="tb btn btn-success" onClick={() => toggleIsAddUserType()} id="addUser">
                     <i className="fa fa-user-plus"></i>
                   </Button>
                   <Tooltip placement="bottom" isOpen={tooltipOpen2} target="addUser" toggle={toggle2}>
@@ -160,23 +147,10 @@ const UsersTable = props => {
                   </Tooltip>
                 </>
               : null}
-              {props.auth.modules[2] === 2 ?
-                <>
-                  <Button style={{float: 'right'}} size="sm" className="tb btn btn-warning white" id="userTypes">
-                    <Link to={`user_types`} style={{float: 'right'}}>
-                      <i className="fa fa-fw fa-users" style={{color: 'white'}}/>
-                    </Link>
-                  </Button>
-                  <Tooltip placement="bottom" isOpen={tooltipOpen3} target="userTypes" toggle={toggle3}>
-                    Tipos de usuario
-                  </Tooltip>
-                </>
-              : null
-              }
             </CardHeader>
             <CardBody className="table-card">
               <ToolkitProvider
-                data={props.users.users}
+                data={props.userTypes.userTypes}
                 keyField="id"
                 columns={[
                   {
@@ -185,33 +159,10 @@ const UsersTable = props => {
                     filter: textFilter(),
                     sort: true
                   }, {
-                    dataField: "username",
-                    text: "Username",
+                    dataField: "name",
+                    text: "nombre",
                     filter: textFilter(),
                     sort: true
-                  }, {
-                    dataField: "firstname",
-                    text: "Nombre",
-                    filter: textFilter(),
-                    sort: true
-                  }, {
-                    dataField: "lastname",
-                    text: "Apellido",
-                    filter: textFilter(),
-                    sort: true
-                  }, {
-                    dataField: "UserType.id",
-                    text: 'tipo de usuario',
-                    sort: false,
-                    formatter: cell => selectOptions[cell],
-                    filter: selectFilter({
-                      options: selectOptions
-                    })
-                  },
-                   {
-                    dataField: "last_connection",
-                    text: 'última conexión',
-                    sort: false
                   }, {
                     dataField: 'link',
                     text: 'acciones',
@@ -219,7 +170,7 @@ const UsersTable = props => {
                     formatter: (rowContent, row) => {
                       return (
                         <>
-                          <Link to={`/users/${row.id}`}>
+                          <Link to={`/user_types/${row.id}`}>
                             <i className="fa fa-pencil" style={{fontSize: 15, paddingRight: 10}}/>
                           </Link>
                           <i className="fa fa-user-times" onClick={() => handleDelete(row.id)} style={{fontSize: 15, color: '#f5365c', cursor: 'pointer'}}/>
@@ -253,4 +204,4 @@ const UsersTable = props => {
   )
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(UsersTable);
+export default connect(mapStateToProps, mapDispatchToProps)(UserTypesTable);

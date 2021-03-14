@@ -6,12 +6,20 @@ a:hover {
 .btn.btn-success:hover {
   background-color: #28a745;
   border-color: #28a745;
+  color: white !important;
 }
 .btn.btn-info:hover {
   background-color: #17a2b8;
   border-color: #17a2b8;
 }
-
+.btn.btn-warning:hover {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: white !important;
+}
+.white {
+  color: white !important;
+}
 .tb.btn {
   margin-right: 5px;
 }
@@ -22,7 +30,7 @@ a:hover {
 .card-header {
   padding-bottom: 0px !important;
 }
-.card-body {
+.card-body.table-card {
   padding-top: 0px !important;
   padding-left: 10px !important;
   padding-right: 10px !important;
@@ -73,4 +81,10 @@ span {
 }
 label.filter-label {
   display: block !important;
+}
+.modal-header {
+  padding-bottom: 10px !important;
+}
+.text-muted p {
+  font-size: 14px !important;
 }

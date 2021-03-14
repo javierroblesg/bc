@@ -1,18 +1,26 @@
 import * as ActionTypes from '../../router/actionTypes';
 
 //FLASH MESSAGE
-export const flashMessageSuccess = (message) => {
+export const flashMessageSuccess = (message, icon) => {
   return {
     type: ActionTypes.FLASHMESSAGE_SUCCESS,
-    message
+    message,
+    icon
   }
 }
 
-export const flashMessageFailure = (message, category) => {
+export const flashMessageFailure = (message, category, icon) => {
   return {
     type: ActionTypes.FLASHMESSAGE_FAILURE,
     message,
-    category
+    category,
+    icon
+  }
+}
+
+export const flashMessageLoading = () => {
+  return {
+    type: ActionTypes.FLASHMESSAGE_LOADING,
   }
 }
 

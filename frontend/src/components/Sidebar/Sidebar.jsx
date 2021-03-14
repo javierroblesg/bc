@@ -14,7 +14,7 @@ const Sidebar = props => {
       <Toggle/>
       <Nav defaultSelected={location.pathname}>
         {props.routes.map(route => {
-          if (props.auth.modules[route.module] !== 0) {
+          if (props.auth.modules[route.module] !== 0 && route.layout === '/admin') {
             return (
               <NavItem eventKey={route.path} key={route.path}>
                 <NavIcon>

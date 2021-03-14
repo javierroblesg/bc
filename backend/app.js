@@ -13,6 +13,8 @@ const passport = require('passport');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var userTypeRouter = require('./routes/user_types');
+var servicesCategoriesRouter = require('./routes/services_categories');
 
 var app = express();
 
@@ -31,6 +33,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', indexRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/user_types', userTypeRouter)
+app.use('/api/services_categories', servicesCategoriesRouter);
 
 db.sequelize.sync({ force : false });
 

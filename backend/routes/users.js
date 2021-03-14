@@ -2,9 +2,11 @@ var express = require('express');
 var usersRouter = express.Router();
 const db = require('../database/index');
 const User = db.models.User;
+const UserType = db.models.UserType;
+const UserCategories = db.models.UserCategories;
+const { QueryTypes } = require('sequelize');
 const crypto = require('crypto');
 const cors = require('./cors');
-const { QueryTypes } = require('sequelize');
 
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
@@ -61,6 +63,7 @@ usersRouter.route('/')
   try {
     const users = await User.findAll({
       attributes: ['id', 'username', 'firstname', 'lastname', 'last_connection'],
+      include: [ {model: UserType} ],
       order: [["id", "ASC"]]
     });
     res.setHeader('Content-Type', 'application/json');
@@ -78,13 +81,16 @@ usersRouter.route('/')
     const Password = req.body.password;
     let hash = crypto.pbkdf2Sync(Password, salt1, 1000, 64, 'sha512').toString('hex');
     try {
-      const newUser = await User.create({
+      const userTypeModules = await UserType.findByPk(req.body.user_type);
+      await User.create({
         username: req.body.username,
         password: hash,
         firstname: req.body.firstname,
         lastname: req.body.lastname,
-        modules: req.body.modules,
-        last_connection: new Date()
+        modules: userTypeModules.modules,
+        user_type: req.body.user_type,
+        last_connection: new Date(),
+        can_services: userTypeModules.can_services
       });
       res.setHeader('Content-Type', 'application/json');
       res.status(200).json({ success: true });
@@ -111,12 +117,15 @@ usersRouter.route('/:id')
 .get( cors.cors, authenticate.verifyUser, async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id, {
-      attributes: ['id', 'username', 'firstname', 'lastname', 'last_connection', 'createdAt'],
+      attributes: ['id', 'username', 'firstname', 'lastname', 'last_connection', 'createdAt', 'modules', 'can_services'],
+      include: [ {model: UserType} ]
     });
+    const query = "WITH user_services AS (SELECT sc.id as 'category_id' FROM services_categories sc LEFT JOIN user_categories uc on sc.id = uc.id_category WHERE uc.id_user = $user_id) SELECT sc.id, sc.name, CAST(CASE WHEN us.category_id IS NOT NULL THEN 1 ELSE 0 END as bit) as has_category FROM services_categories sc LEFT JOIN user_services us on us.category_id = sc.id";
+    const categories = await db.sequelize.query(query, { bind: { user_id: req.params.id }, type: QueryTypes.SELECT });
     if (user) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json(user);
+      res.json({user, categories});
     } else {
       res.setHeader('Content-Type', 'application/json');
       res.status(404).json({ exists: false });
@@ -131,11 +140,15 @@ usersRouter.route('/:id')
     try {
       const user = await User.findByPk(req.params.id);
       if (user) {
+        const userTypeModules = await UserType.findByPk(req.body.user_type);
         await user.update({
           username: req.body.username,
           firstname: req.body.firstname,
-          lastname: req.body.lastname
-        }, {fields: ['username', 'firstname', 'lastname'] } );
+          lastname: req.body.lastname,
+          user_type: req.body.user_type,
+          modules: userTypeModules.modules,
+          can_services: userTypeModules.can_services
+        }, {fields: ['username', 'firstname', 'lastname', 'user_type', 'modules', 'can_services'] } );
         res.setHeader ('Content-Type', 'application/json');
         res.status(200).json(user);
       } else {
@@ -174,5 +187,80 @@ usersRouter.route('/:id')
     next(err);
   }
 });
+
+// routes for /users/modules/:id
+usersRouter.route('/modules/:id')
+.all( async (req, res, next) => {
+  req.query.module = "1";
+  next();
+})
+.options(cors.cors, (req, res) => { 
+  res.setHeader('Allow', 'GET, POST, PUT')
+  res.sendStatus(200) 
+})
+.put( cors.cors, authenticate.verifyUser, async (req, res, next) => {
+  if (req.query.canEdit) {
+    try {
+      const user = await User.findByPk(req.params.id);
+      if (user) {
+        await user.update({
+          modules: JSON.stringify(req.body.modules)
+        }, {fields: ['modules'] } );
+        res.setHeader ('Content-Type', 'application/json');
+        res.status(200).json(user);
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json({exists: false});
+      }
+    } catch (err) {
+      res.setHeader('Content-Type', 'application/json');
+      res.status(500).json(err);
+    }
+  } else {
+    const err = new Error('canEdit: false');
+    err.status = 401;
+    next(err);
+  }
+})
+
+
+// routes for /users/categories/:id
+usersRouter.route('/categories/:id')
+.all( async (req, res, next) => {
+  req.query.module = "1";
+  next();
+})
+.options(cors.cors, (req, res) => { 
+  res.setHeader('Allow', 'PUT')
+  res.sendStatus(200) 
+})
+.put( cors.corsWithOptions, authenticate.verifyUser, async (req, res) => {
+  if (req.query.canEdit) {
+    try {
+      const user = await User.findByPk(req.params.id);
+      if (user) {
+        const hasCategory = await UserCategories.findOne({ where: { id_user: req.params.id, id_category: req.body.categoryId } })
+        if (hasCategory) {
+          // Already has category, delete it
+          await hasCategory.destroy();
+        } else {
+          // Doesn't has category, add it
+          await UserCategories.create({
+            id_user: req.params.id,
+            id_category: req.body.categoryId
+          });
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json({ success: true });
+      }
+    } catch (err) {
+      next(err);
+    }
+  } else {
+    const err = new Error('canEdit: false');
+    err.status = 401;
+    next(err);
+  }
+})
 
 module.exports = usersRouter;

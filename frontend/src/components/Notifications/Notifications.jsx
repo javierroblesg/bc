@@ -10,11 +10,11 @@ const mapStateToProps = state => {
 }
 
 class Notifications extends React.Component {
-  myFunc = (type, title, body) => {
+  myFunc = (type, title, body, icon) => {
     let options = {
       place: "tr",
       message: (
-        <div className="alert-text">
+        <div className="alert-text" style={{display: 'inline'}}>
           <span className="alert-title" data-notify="title">
             {" "}
             {title}
@@ -27,18 +27,19 @@ class Notifications extends React.Component {
         </div>
       ),
       type: type,
-      icon: "fa fa-user-o",
+      icon: `${icon}`,
       autoDismiss: 5
     };
     this.refs.notify.notificationAlert(options);
-  };ç
+  };
   render () {
 
     if(this.props.flashMessage.success !== null && this.props.flashMessage.category !== 'fetching') {
       if (this.props.flashMessage.success) {
-        this.myFunc('success', 'Operation completed!', this.props.flashMessage.message);
+        console.log(this.props.flashMessage.icon);
+        this.myFunc('success', 'Operación completada!', this.props.flashMessage.message, this.props.flashMessage.icon);
       } else {
-        this.myFunc('danger', 'There was a problem!', this.props.flashMessage.message);
+        this.myFunc('danger', 'Hubo un problema!', this.props.flashMessage.message, this.props.flashMessage.icon);
       }
     }
 

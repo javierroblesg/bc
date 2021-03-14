@@ -4,7 +4,6 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import Sidebar from '../components/Sidebar/Sidebar';
 import AdminNavbar from '../components/Navbar/AdminNavbar';
 import Notifications from '../components/Notifications/Notifications';
-
 import routes from '../routes';
 
 import { connect } from 'react-redux';
@@ -18,7 +17,7 @@ const Admin = props => {
 
   const getRoutes = routes => {
     return routes.map((prop, key) => {
-      if (prop.layout === '/admin') {
+      if (prop.layout === '/admin' || prop.layout === '/noAdmin') {
         if (props.auth.modules[prop.module] !== 0) {
           return (<Route path={prop.path} component={prop.component} key={key} />);
         } else {

@@ -33,3 +33,21 @@ export const singleUser = (state = {
       return state;
   }
 }
+
+export const userTypes = (state = {
+  isLoading: false,
+  userTypes: [],
+  errorMessage: null,
+  loaded: false
+}, action) => {
+  switch (action.type) {
+    case ActionTypes.USERTYPES_LOADING:
+      return {...state, isLoading: true, userTypes: [], errorMessage: null, loaded: false};
+    case ActionTypes.USERTYPES_SUCCESS:
+      return {...state, isLoading: false, userTypes: action.payload, errorMessage: null, loaded: true};
+    case ActionTypes.USERTYPES_FAILED:
+      return {...state, isLoading: false, userTypes: [], errorMessage: action.message, loaded: true};
+    default:
+      return state;
+  }
+}

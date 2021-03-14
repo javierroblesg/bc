@@ -29,13 +29,31 @@ module.exports = (sequelize) => {
       type: Sequelize.DATE
     },
     modules: {
-      type: Sequelize.STRING
-    } 
+      type: Sequelize.STRING,
+      allowNull: false
+    },
+    can_services: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false
+    }
   }, { 
     tableName: 'users',
     paranoid: true,
     sequelize
   });
-
+  User.associate = (models) => {
+    User.belongsTo(models.UserType, {
+      foreignKey: {
+        fieldName: 'user_type',
+        allowNull: false
+      }
+    }),
+    User.hasMany(models.UserCategories, {
+      foreignKey: {
+        fieldName: 'id_user',
+        allowNull: false
+      }
+    })
+  }
   return User;
 }
